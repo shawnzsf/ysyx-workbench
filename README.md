@@ -6,4 +6,5 @@ bash init.sh subproject-name
 ```
 进行初始化, 具体请参考[实验讲义][lecture note].
 
-[lecture note]: https://docs.ysyx.org/schedule.html
+[lecture note]: https://docs.ysyx.org/schedule.
+22050335-Zhang Shoufeng
