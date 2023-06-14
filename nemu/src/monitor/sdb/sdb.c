@@ -42,6 +42,24 @@ static char* rl_gets() {
   return line_read;
 }
 
+extern word_t paddr_read(paddr_t addr, int len);
+
+static int cmd_x(char *args){
+  char* n = strtok(NULL, " ");
+  char* baseaddr = strtok(NULL, " ");
+  printf("n=%s\n", n);
+  printf("baseaddr=%s\n", baseaddr);
+  int len = 0;
+  paddr_t addr = 0;
+  sscanf(n,"%d", &len);
+  sscanf(baseaddr,"%x", &addr);
+  for(int i = 0; i < len; i++){
+    printf("addr: 0x%x, mem = 0x%8lx\n", addr ,paddr_read(addr,4));
+    addr += 4;
+  }                                                                                                     
+  return 0;
+}
+
 static int cmd_c(char *args) {
   cpu_exec(-1);
   return 0;
@@ -81,6 +99,7 @@ static struct {
   { "q", "Exit NEMU", cmd_q },
   { "si", "run program", cmd_si},
   { "info", "print register", cmd_info},
+  { "x", "scan memory", cmd_x},
 
   /* TODO: Add more commands */
 
