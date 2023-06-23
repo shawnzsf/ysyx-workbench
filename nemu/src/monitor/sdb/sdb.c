@@ -44,6 +44,17 @@ static char* rl_gets() {
 
 extern word_t paddr_read(paddr_t addr, int len);
 
+static int cmd_p(char* args) {
+  bool success;
+  word_t res = expr(args, &success);
+  if (!success) {
+    puts("invalid expression");
+  } else {
+    printf("%lu\n", res);
+  }
+  return 0;
+}
+
 static int cmd_x(char *args){
   char* n = strtok(NULL, " ");
   char* baseaddr = strtok(NULL, " ");
@@ -100,6 +111,7 @@ static struct {
   { "si", "run program", cmd_si},
   { "info", "print register", cmd_info},
   { "x", "scan memory", cmd_x},
+  {"p", "Calculate the expression", cmd_p }
 
   /* TODO: Add more commands */
 
