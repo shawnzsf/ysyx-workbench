@@ -46,11 +46,11 @@ extern word_t paddr_read(paddr_t addr, int len);
 
 static int cmd_p(char* args) {
   bool success;
-  word_t res = expr(args, &success);
+  int res = expr(args, &success);
   if (!success) {
     puts("invalid expression");
   } else {
-    printf("%lu\n", res);
+    printf("%d\n", res);
   }
   return 0;
 }

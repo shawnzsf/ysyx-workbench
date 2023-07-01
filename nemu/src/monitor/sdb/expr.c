@@ -217,7 +217,7 @@ int find_major(int p, int q) {
   return ret;
 }
 
-static word_t eval_scale(int i, bool *ok){
+static int eval_scale(int i, bool *ok){
   switch (tokens[i].type){
     case TK_NUM:
       if (strncmp("0x", tokens[i].str, 2) == 0) return strtol(tokens[i].str, NULL, 16);
@@ -230,7 +230,7 @@ static word_t eval_scale(int i, bool *ok){
 
 extern word_t paddr_read(paddr_t addr, int len);
 
-static word_t unary_op(int op, word_t val, bool *ok){
+static int unary_op(int op, int val, bool *ok){
   switch (op){
     case TK_NEG: return -val;
     case TK_POS: return val;
@@ -241,7 +241,7 @@ static word_t unary_op(int op, word_t val, bool *ok){
   return 0;
 }
 
-static word_t binary_op(int op, word_t val1, word_t val2, bool *ok){
+static int binary_op(int op, int val1, int val2, bool *ok){
   switch (op){
     case '+': return val1 + val2;
     case '-': return val1 - val2;
@@ -264,7 +264,7 @@ static word_t binary_op(int op, word_t val1, word_t val2, bool *ok){
   }
 }
 
-static word_t eval(int p, int q, bool *ok) {
+static int eval(int p, int q, bool *ok) {
   *ok = true;
   if (p > q) {
     *ok = false;
@@ -284,19 +284,19 @@ static word_t eval(int p, int q, bool *ok) {
     }
 
     bool ok1, ok2;
-    word_t val1 = eval(p, major-1, &ok1);
-    word_t val2 = eval(major+1, q, &ok2);
+    int val1 = eval(p, major-1, &ok1);
+    int val2 = eval(major+1, q, &ok2);
 
     if(!ok2){
       *ok = false;
       return 0;
     }
     if(ok1){
-      word_t ret = binary_op(tokens[major].type, val1, val2, ok);
+      int ret = binary_op(tokens[major].type, val1, val2, ok);
       return ret;
     }
     else{
-      word_t ret = unary_op(tokens[major].type, val2, ok);
+      int ret = unary_op(tokens[major].type, val2, ok);
       return ret;
     }
   }
