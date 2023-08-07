@@ -42,35 +42,6 @@ static char* rl_gets() {
   return line_read;
 }
 
-extern word_t paddr_read(paddr_t addr, int len);
-
-static int cmd_p(char* args) {
-  bool success;
-  int res = expr(args, &success);
-  if (!success) {
-    puts("invalid expression");
-  } else {
-    printf("%d\n", res);
-  }
-  return 0;
-}
-
-static int cmd_x(char *args){
-  char* n = strtok(NULL, " ");
-  char* baseaddr = strtok(NULL, " ");
-  printf("n=%s\n", n);
-  printf("baseaddr=%s\n", baseaddr);
-  int len = 0;
-  paddr_t addr = 0;
-  sscanf(n,"%d", &len);
-  sscanf(baseaddr,"%x", &addr);
-  for(int i = 0; i < len; i++){
-    printf("addr: 0x%x, mem = 0x%8lx\n", addr ,paddr_read(addr,4));
-    addr += 4;
-  }                                                                                                     
-  return 0;
-}
-
 static int cmd_c(char *args) {
   cpu_exec(-1);
   return 0;
@@ -78,27 +49,17 @@ static int cmd_c(char *args) {
 
 
 static int cmd_q(char *args) {
-  nemu_state.state = NEMU_QUIT; 
+  nemu_state.state = NEMU_END;
+  nemu_state.halt_ret = 0;
+  nemu_state.state = NEMU_QUIT;
   return -1;
 }
 
 static int cmd_help(char *args);
-
-static int cmd_si(char *args){
-  int step = 0;
-  if(args == NULL)
-    step = 1;
-  else
-    sscanf(args, "%d", &step);
-  cpu_exec(step);
-  return 0;
-}
-
-static int cmd_info(char *args){
-  if(strcmp(args, "r") == 0)
-    isa_reg_display();
-  return 0;
-}
+static int cmd_si(char *args);
+static int cmd_info(char *args);
+static int cmd_x(char *args);
+static int cmd_p(char *args);
 
 static struct {
   const char *name;
@@ -108,10 +69,10 @@ static struct {
   { "help", "Display information about all supported commands", cmd_help },
   { "c", "Continue the execution of the program", cmd_c },
   { "q", "Exit NEMU", cmd_q },
-  { "si", "run program", cmd_si},
-  { "info", "print register", cmd_info},
-  { "x", "scan memory", cmd_x},
-  {"p", "Calculate the expression", cmd_p }
+  { "si", "Control the CPU execution", cmd_si},
+  { "info", "Print related information", cmd_info},
+  { "x", "Scan Memory", cmd_x},
+  { "p", "Calculate Expression", cmd_p},
 
   /* TODO: Add more commands */
 
@@ -139,6 +100,55 @@ static int cmd_help(char *args) {
     }
     printf("Unknown command '%s'\n", arg);
   }
+  return 0;
+}
+
+static int cmd_info(char *args){
+  char type;
+  sscanf(args, "%s", &type);
+  
+  if(type == 'r') isa_reg_display();
+  
+  return 0;
+}
+
+static int cmd_si(char *args) {
+  int num = 0;
+  
+  if(args == NULL) num = 1;
+  else sscanf(args, "%d", &num);
+  cpu_exec(num);
+  
+  return 0;
+}
+
+extern word_t vaddr_read(vaddr_t addr, int len);
+
+static int cmd_x(char *args){
+  char *n = strtok(NULL, " ");
+  char *initaddr = strtok(NULL, " ");
+  vaddr_t addr; int len;
+
+  sscanf(n, "%d", &len);
+  sscanf(initaddr, "%x", &addr);
+
+  for(int i = 0; i < len; i++){
+    printf("0x%x : 0x%x\n", addr, vaddr_read(addr, 4));
+    addr += 4;
+  }
+  return 0;
+}
+
+extern word_t expr(char *e, bool *success);
+
+static int cmd_p(char *args){
+  if(args == NULL){
+    printf("No expression!\n");
+    return 0;
+  }
+  bool success = true;
+  int num = expr(args, &success);
+  printf("result = %d\n", num);
   return 0;
 }
 
