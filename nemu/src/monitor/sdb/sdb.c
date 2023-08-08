@@ -161,6 +161,10 @@ static int cmd_p(char *args){
 }
 
 static int cmd_w(char* args) {
+  if(!args){
+    printf("No expression.\n");
+    assert(0);
+  }
   bool success = true;
   int result = expr(args, &success);
   assert(success);
