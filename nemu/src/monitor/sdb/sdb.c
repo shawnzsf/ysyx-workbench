@@ -60,19 +60,23 @@ static int cmd_si(char *args);
 static int cmd_info(char *args);
 static int cmd_x(char *args);
 static int cmd_p(char *args);
+static int cmd_w(char *args);
+static int cmd_d(char *args);
 
 static struct {
   const char *name;
   const char *description;
   int (*handler) (char *);
 } cmd_table [] = {
-  { "help", "Display information about all supported commands", cmd_help },
-  { "c", "Continue the execution of the program", cmd_c },
-  { "q", "Exit NEMU", cmd_q },
-  { "si", "Control the CPU execution", cmd_si},
-  { "info", "Print related information", cmd_info},
-  { "x", "Scan Memory", cmd_x},
-  { "p", "Calculate Expression", cmd_p},
+  { "help", "Display information about all supported commands",       cmd_help    },
+  { "c", "Continue the execution of the program",                     cmd_c       },
+  { "q", "Exit NEMU",                                                 cmd_q       },
+  { "si", "Control the CPU execution",                                cmd_si      },
+  { "info", "Print related information",                              cmd_info    },
+  { "x", "Scan Memory",                                               cmd_x       },
+  { "p", "Calculate Expression",                                      cmd_p       },
+  { "w", "New Watchpoint.",                                           cmd_w       },
+  { "d", "Delete Watchpoint",                                         cmd_d       },
 
   /* TODO: Add more commands */
 
@@ -103,12 +107,15 @@ static int cmd_help(char *args) {
   return 0;
 }
 
+extern void display_wp();
+
 static int cmd_info(char *args){
   char type;
   sscanf(args, "%s", &type);
   
   if(type == 'r') isa_reg_display();
-  
+  if(type == 'w') display_wp();
+
   return 0;
 }
 
@@ -123,6 +130,8 @@ static int cmd_si(char *args) {
 }
 
 extern word_t vaddr_read(vaddr_t addr, int len);
+extern void set_wp(char *expr, int result);
+extern void delete_wp(int NO);
 
 static int cmd_x(char *args){
   char *n = strtok(NULL, " ");
@@ -140,7 +149,6 @@ static int cmd_x(char *args){
 }
 
 extern word_t expr(char *e, bool *success);
-
 static int cmd_p(char *args){
   if(args == NULL){
     printf("No expression!\n");
@@ -149,6 +157,24 @@ static int cmd_p(char *args){
   bool success = true;
   int num = expr(args, &success);
   printf("result = %d\n", num);
+  return 0;
+}
+
+static int cmd_w(char* args) {
+  bool success = true;
+  int result = expr(args, &success);
+  assert(success);
+  set_wp(args, result);
+  return 0;
+}
+
+static int cmd_d(char *args){
+  if(!args){
+    printf("No watchpoint number.\n");
+    assert(0);
+  }
+  int NO = strtol(args, NULL, 10);
+  delete_wp(NO);
   return 0;
 }
 

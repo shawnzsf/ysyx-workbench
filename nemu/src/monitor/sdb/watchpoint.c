@@ -14,68 +14,20 @@
 ***************************************************************************************/
 
 #include "sdb.h"
+
 #define NR_WP 32
 
 typedef struct watchpoint {
   int NO;
   struct watchpoint *next;
-  char* expr;
-  int former;
-
+  int value;
+  char *expr;
   /* TODO: Add more members if necessary */
 
 } WP;
 
 static WP wp_pool[NR_WP] = {};
 static WP *head = NULL, *free_ = NULL;
-
-static WP* new_wp() {
-  if(!free_) printf("No more watchpoints!");
-  WP* ret = free_;
-  free_ = free_->next;
-  ret->next = head;
-  head = ret;
-  return ret;
-}
-
-static void free_wp(WP *wp) {
-  WP* h = head;
-  if (h == wp) head = NULL;
-  else {
-    while (h && h->next != wp) h = h->next;
-    assert(h);
-    h->next = wp->next;
-  }
-  wp->next = free_;
-  free_ = wp;
-}
-
-void wp_watch(char* expr, int res){
-  WP* wp = new_wp();
-  wp->expr = expr;
-  wp->former = res;
-  printf("Watchpoint %d: %s\n", wp->NO, wp->expr);
-}
-
-void wp_remove(int no) {
-  assert(no < NR_WP);
-  WP* wp = &wp_pool[no];
-  free_wp(wp);
-  printf("Delete watchpoint %d: %s\n", wp->NO, wp->expr);
-}
-
-void wp_iterate() {
-  WP* h = head;
-  if (!h) {
-    puts("No watchpoints.");
-    return;
-  }
-  printf("%-8s%-8s\n", "Sequence ", "Expression");
-  while (h) {
-    printf("%-8d%-8s\n", h->NO, h->expr);
-    h = h->next;
-  }
-}
 
 void init_wp_pool() {
   int i;
@@ -88,5 +40,68 @@ void init_wp_pool() {
   free_ = wp_pool;
 }
 
+WP *new_wp(){
+  if(!free_){
+    printf("No free watchpoints.\n");
+    assert(0);
+  }
+  WP* new = free_;
+  free_ = free_ -> next;
+  head = new;
+  return new;
+}
+
+void free_wp(WP *wp){
+  WP *flag = &wp_pool[0];
+  if(wp == head) head = NULL;
+  else{
+    while(flag && flag->next != head) flag = flag->next;
+    flag->next = wp->next;
+  }
+  free_ = wp;
+}
+
+void set_wp(char *expr, int result){
+  WP* wp = new_wp();
+  wp->expr = strndup(expr, strlen(expr));
+  //wp->expr = expr
+  wp->value = result;
+  printf("Set watchpoint %d: %s\n", wp->NO, expr);
+}
+
+void delete_wp(int NO){
+  assert(NO < NR_WP);
+  WP* wp = &wp_pool[NO];
+  WP* bwp = &wp_pool[NO-1];
+  WP* pwp = &wp_pool[NO+1];
+  printf("Delete watchpoint %d: %s\n", wp->NO, wp->expr);
+  free_wp(wp);
+  wp->expr = NULL;
+  bwp->next = wp;
+  wp->next = pwp;
+}
+
+void display_wp(){
+  WP* first = &wp_pool[0];
+  printf("%-8s%-8s\n", "Number", "Expression");
+  while(first){
+    printf("%-8d%-8s\n", first->NO, first->expr);
+    first = first->next;
+  }
+}
+
+void check_wp(){
+  WP* first = &wp_pool[0];
+  while(first != head + 1){
+    bool success;
+    int new = expr(first->expr, &success);
+    if(first->value != new){
+      printf("Watchpoint %d: %s\n", first->NO, first->expr);
+      printf("Old value = %d\n", first->value);
+      printf("New value = %d\n", new);
+    }
+    first = first->next;
+  }
+}
 /* TODO: Implement the functionality of watchpoint */
 
