@@ -49,8 +49,6 @@ static int cmd_c(char *args) {
 
 
 static int cmd_q(char *args) {
-  nemu_state.state = NEMU_END;
-  nemu_state.halt_ret = 0;
   nemu_state.state = NEMU_QUIT;
   return -1;
 }
@@ -129,7 +127,7 @@ static int cmd_si(char *args) {
   return 0;
 }
 
-extern word_t vaddr_read(vaddr_t addr, int len);
+extern word_t paddr_read(vaddr_t addr, int len);
 extern void set_wp(char *expr, int result);
 extern void delete_wp(int NO);
 
@@ -142,7 +140,7 @@ static int cmd_x(char *args){
   sscanf(initaddr, "%x", &addr);
 
   for(int i = 0; i < len; i++){
-    printf("0x%x : 0x%x\n", addr, vaddr_read(addr, 4));
+    printf("0x%x : 0x%x\n", addr, paddr_read(addr, 4));
     addr += 4;
   }
   return 0;

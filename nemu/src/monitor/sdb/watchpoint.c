@@ -99,6 +99,7 @@ void check_wp(){
       printf("Watchpoint %d: %s\n", first->NO, first->expr);
       printf("Old value = %d\n", first->value);
       printf("New value = %d\n", new);
+      nemu_state.state = NEMU_STOP;
     }
     first = first->next;
   }
