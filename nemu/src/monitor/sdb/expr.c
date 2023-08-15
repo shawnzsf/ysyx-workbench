@@ -240,7 +240,7 @@ int Hex_Conversion_Dec(int hex){
 extern word_t vaddr_read(vaddr_t addr, int len);
 
 int eval(int p, int q){
-  printf("start = %d, end = %d\n", p, q);
+  //printf("start = %d, end = %d\n", p, q);
   if (p > q){
     printf("Bad Expression!.\n");
     assert(0);
@@ -305,10 +305,10 @@ word_t expr(char *e, bool *success) {
     *success = false;
     return 0;
   }
-  printf("token type = %d\n", tokens[0].type);
+  //printf("token type = %d\n", tokens[0].type);
   check_unary(0, nr_token-1);
-  printf("token type = %d\n", tokens[0].type);
-  printf("nr_token = %d\n", nr_token);
+  //printf("token type = %d\n", tokens[0].type);
+  //printf("nr_token = %d\n", nr_token);
   int num = eval(0, nr_token-1);
   /* TODO: Insert codes to evaluate the expression. */
   return num;
