@@ -257,13 +257,13 @@ int eval(int p, int q){
     return num;
   }
   else if(check_parentheses(p, q) == true){
-    printf("parentheses start = %d, parentheses end = %d\n", p, q);
+    //printf("parentheses start = %d, parentheses end = %d\n", p, q);
     return eval(p+1, q-1);
   }
   else{
     int major = find_major(p, q);
-    printf("check parentheses = %d\n", check_parentheses(p, q));
-    printf("major = %d\n", major);
+    //printf("check parentheses = %d\n", check_parentheses(p, q));
+    //printf("major = %d\n", major);
     if(major < 0) assert(0);
     int val1 = 0;
     if(tokens[major].type != TK_NEG 
@@ -272,7 +272,7 @@ int eval(int p, int q){
     && tokens[major].type != TK_HEX
     && tokens[major].type != TK_NOT) val1 = eval(p, major-1);
     int val2 = eval(major+1, q);
-    printf("val1 = %d, val2 = %d\n", val1, val2);
+    //printf("val1 = %d, val2 = %d\n", val1, val2);
 
     switch(tokens[major].type){
       case '+':             return val1 + val2;
