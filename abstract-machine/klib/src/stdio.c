@@ -15,12 +15,12 @@ int vsprintf(char *out, const char *fmt, va_list ap) {
 
 int sprintf(char *out, const char *fmt, ...) {
   // panic("Not implemented");
-    va_list ap;
-    int ret = -1;
-    va_start(ap, fmt);
-    ret = vsprintf(out, fmt, ap);
-    va_end(ap);
-    return ret;
+  va_list ap;
+  int ret = -1;
+  va_start(ap, fmt);
+  ret = vsprintf(out, fmt, ap);
+  va_end(ap);
+  return ret;
 }
 
 int snprintf(char *out, size_t n, const char *fmt, ...) {
@@ -56,7 +56,7 @@ int vsnprintf(char *out, size_t n, const char *fmt, va_list ap) {
             out[pos++] = '-';
             if (pos > n) return n;
         }
-        char num[20] = {0};
+        char num[20] = {};
         int rem = 0, length = 0;
         do {
           rem = d % 10;
