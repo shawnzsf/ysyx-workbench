@@ -27,7 +27,7 @@ void display_inst() {
 
   char buf[128]; 
   char *p;
-  printf("Executed instructions near the bad trap\n");
+  printf("Recently Executed Instructions: \n");
   do {
     p = buf;
     p += sprintf(buf, "-- 0x%x: %08x      ", Itracebuf[i].pc, Itracebuf[i].inst);
@@ -36,3 +36,10 @@ void display_inst() {
   } while ((i = (i + 1) % MAX_SIZE) != end);
 }
 
+void addread(paddr_t addr, int len) {
+  printf("address read at " FMT_PADDR " length = %d\n", addr, len);
+}
+
+void addwrite(paddr_t addr, int len, word_t data) {
+  printf("address write at " FMT_PADDR " length = %d, data = " FMT_WORD "\n", addr, len, data);
+}
